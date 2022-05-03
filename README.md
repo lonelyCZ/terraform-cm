@@ -1,25 +1,19 @@
-# Setup Cert-manager and Vault with the Terraform Helm provider
+# Deploy and Setup Cert-manager and Vault with the Terraform
 
-<!-- vscode-markdown-toc -->
-* 1. [Goals](#Goals)
-* 2. [Install `Helm`, `Terraform` and `Terragrunt`](#InstallHelmTerraformandTerragrunt)
-	* 2.1. [Helm](#Helm)
-	* 2.2. [Terraform](#Terraform)
-	* 2.3. [Terragrunt](#Terragrunt)
-* 3. [Usage Steps](#UsageSteps)
-	* 3.1. [Configure Terraform Plugin Cache.](#ConfigureTerraformPluginCache.)
-	* 3.2. [Execute `terragrunt run-all init`](#Executeterragruntrun-allinit)
-	* 3.3. [Execute `terragrunt run-all apply`](#Executeterragruntrun-allapply)
-	* 3.4. [View Deployment Results](#ViewDeploymentResults)
-	* 3.5. [Check Status of `ClusterIssuer`](#CheckStatusofClusterIssuer)
 
-<!-- vscode-markdown-toc-config
-	numbering=true
-	autoSave=true
-	/vscode-markdown-toc-config -->
-<!-- /vscode-markdown-toc -->
+  - [Goals](#goals)
+  - [Install `Helm`, `Terraform` and `Terragrunt`](#install-helm-terraform-and-terragrunt)
+    - [Helm](#helm)
+    - [Terraform](#terraform)
+    - [Terragrunt](#terragrunt)
+  - [Usage Steps](#usage-steps)
+    - [1. Configure Terraform Plugin Cache.](#1-configure-terraform-plugin-cache)
+    - [2. Execute `terragrunt run-all init`](#2-execute-terragrunt-run-all-init)
+    - [3. Execute `terragrunt run-all apply`](#3-execute-terragrunt-run-all-apply)
+    - [4. View Deployment Results](#4-view-deployment-results)
+    - [5. Check Status of `ClusterIssuer`](#5-check-status-of-clusterissuer)
 
-##  1. <a name='Goals'></a>Goals
+## Goals
 
 1. Deploy and setup Cert-manager and Vault in test environment with Terraform.
 
@@ -28,37 +22,37 @@
 3. Automate to create a ClusterIssuer that represents the certificate authority Vault.
 
 
-##  2. <a name='InstallHelmTerraformandTerragrunt'></a>Install `Helm`, `Terraform` and `Terragrunt`
+## Install `Helm`, `Terraform` and `Terragrunt`
 
 These all are open source softwares, you can directly install them by official documentation.
 
-###  2.1. <a name='Helm'></a>Helm
+### Helm
 
 Helm is the best way to find, share, and use software built for Kubernetes.
 
 [Installing Helm](https://helm.sh/docs/intro/install/)
 
-###  2.2. <a name='Terraform'></a>Terraform
+### Terraform
 
 Terraform is an IT infrastructure automation orchestration tool.
 
 [Install Terraform](https://www.terraform.io/downloads)
 
-###  2.3. <a name='Terragrunt'></a>Terragrunt
+### Terragrunt
 
 Terragrunt is a thin wrapper that provides extra tools for keeping your configurations DRY, working with multiple Terraform modules, and managing remote state.
 
 [Install Terragrunt](https://terragrunt.gruntwork.io/docs/getting-started/install/)
 
-##  3. <a name='UsageSteps'></a>Usage Steps
+## Usage Steps
 
-###  3.1. <a name='ConfigureTerraformPluginCache.'></a>Configure Terraform Plugin Cache.
+### 1. Configure Terraform Plugin Cache.
 
 ```
 export TF_PLUGIN_CACHE_DIR="$HOME/.terraform.d/plugin-cache" 
 ```
 
-###  3.2. <a name='Executeterragruntrun-allinit'></a>Execute `terragrunt run-all init`
+### 2. Execute `terragrunt run-all init`
 ```
 [root@master68 terraform-cm]# terragrunt run-all init
 INFO[0000] The stack at /root/lonelyCZ/terraform-cm will be processed in the following order for command init:
@@ -143,7 +137,7 @@ commands will detect it and remind you to do so if necessary.
 </details>  
 
 
-###  3.3. <a name='Executeterragruntrun-allapply'></a>Execute `terragrunt run-all apply`
+### 3. Execute `terragrunt run-all apply`
 
 ```
 [root@master68 terraform-cm]# terragrunt run-all apply
@@ -505,7 +499,7 @@ Apply complete! Resources: 2 added, 0 changed, 0 destroyed.
 ```
 </details>
 
-###  3.4. <a name='ViewDeploymentResults'></a>View Deployment Results
+### 4. View Deployment Results
 
 ```
 [root@master68 terraform-cm]# kubectl get pod -A
@@ -530,7 +524,7 @@ vault            vault-0                                   1/1     Running   0  
 vault            vault-agent-injector-6cd49f8bbd-vq74f     1/1     Running   0               3m53s
 ```
 
-###  3.5. <a name='CheckStatusofClusterIssuer'></a>Check Status of `ClusterIssuer`
+### 5. Check Status of `ClusterIssuer`
 
 ```
 [root@master68 terraform-cm]# kubectl get clusterissuers -o wide

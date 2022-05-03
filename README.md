@@ -1,6 +1,5 @@
 # Deploy and Setup Cert-manager and Vault with the Terraform
 
-
   - [Goals](#goals)
   - [Install `Helm`, `Terraform` and `Terragrunt`](#install-helm-terraform-and-terragrunt)
     - [Helm](#helm)
@@ -12,6 +11,7 @@
     - [3. Execute `terragrunt run-all apply`](#3-execute-terragrunt-run-all-apply)
     - [4. View Deployment Results](#4-view-deployment-results)
     - [5. Check Status of `ClusterIssuer`](#5-check-status-of-clusterissuer)
+    - [6. Destroy Test Environment.](#6-destroy-test-environment)
 
 ## Goals
 
@@ -70,7 +70,7 @@ Initializing the backend...
 ```
 <details>
 
-<summary><font color=red>Click for more output details</font></summary>
+<summary>Click for more output details</summary>
 
 ```
 Initializing provider plugins...
@@ -156,7 +156,7 @@ Are you sure you want to run 'terragrunt apply' in each folder of the stack desc
 
 <details>
 
-<summary><font color=red>Click for more output details</font></summary>
+<summary>Click for more output details</summary>
 
 ```
 Terraform used the selected providers to generate the following execution
@@ -531,3 +531,457 @@ vault            vault-agent-injector-6cd49f8bbd-vq74f     1/1     Running   0  
 NAME           READY   STATUS           AGE
 vault-issuer   True    Vault verified   3m24s
 ```
+
+### 6. Destroy Test Environment.
+
+```
+[root@master68 terraform-cm]# terragrunt run-all destroy
+INFO[0000] The stack at /root/lonelyCZ/terraform-cm will be processed in the following order for command destroy:
+Group 1
+- Module /root/lonelyCZ/terraform-cm/cert-manager-config
+
+Group 2
+- Module /root/lonelyCZ/terraform-cm/vault-config
+
+Group 3
+- Module /root/lonelyCZ/terraform-cm/helm-release
+ 
+WARNING: Are you sure you want to run `terragrunt destroy` in each folder of the stack described above? There is no undo! (y/n) y
+```
+<details>
+
+<summary>Click for more output details</summary>
+```
+kubernetes_secret_v1.vault-token: Refreshing state... [id=cert-manager/vault-token]
+kubernetes_manifest.vault-issuer: Refreshing state...
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  - destroy
+
+Terraform will perform the following actions:
+
+  # kubernetes_manifest.vault-issuer will be destroyed
+  - resource "kubernetes_manifest" "vault-issuer" {
+      - manifest = {
+          - apiVersion = "cert-manager.io/v1"
+          - kind       = "ClusterIssuer"
+          - metadata   = {
+              - name = "vault-issuer"
+            }
+          - spec       = {
+              - vault = {
+                  - auth   = {
+                      - tokenSecretRef = {
+                          - key  = "token"
+                          - name = "vault-token"
+                        }
+                    }
+                  - path   = "pki/sign/example-dot-com"
+                  - server = "http://vault.vault.svc:8200"
+                }
+            }
+        } -> null
+      - object   = {
+          - apiVersion = "cert-manager.io/v1"
+          - kind       = "ClusterIssuer"
+          - metadata   = {
+              - annotations                = null
+              - clusterName                = null
+              - creationTimestamp          = null
+              - deletionGracePeriodSeconds = null
+              - deletionTimestamp          = null
+              - finalizers                 = null
+              - generateName               = null
+              - generation                 = null
+              - labels                     = null
+              - managedFields              = null
+              - name                       = "vault-issuer"
+              - namespace                  = null
+              - ownerReferences            = null
+              - resourceVersion            = null
+              - selfLink                   = null
+              - uid                        = null
+            }
+          - spec       = {
+              - acme       = {
+                  - disableAccountKeyGeneration = null
+                  - email                       = null
+                  - enableDurationFeature       = null
+                  - externalAccountBinding      = {
+                      - keyAlgorithm = null
+                      - keyID        = null
+                      - keySecretRef = {
+                          - key  = null
+                          - name = null
+                        }
+                    }
+                  - preferredChain              = null
+                  - privateKeySecretRef         = {
+                      - key  = null
+                      - name = null
+                    }
+                  - server                      = null
+                  - skipTLSVerify               = null
+                  - solvers                     = null
+                }
+              - ca         = {
+                  - crlDistributionPoints = null
+                  - ocspServers           = null
+                  - secretName            = null
+                }
+              - selfSigned = {
+                  - crlDistributionPoints = null
+                }
+              - vault      = {
+                  - auth      = {
+                      - appRole        = {
+                          - path      = null
+                          - roleId    = null
+                          - secretRef = {
+                              - key  = null
+                              - name = null
+                            }
+                        }
+                      - kubernetes     = {
+                          - mountPath = null
+                          - role      = null
+                          - secretRef = {
+                              - key  = null
+                              - name = null
+                            }
+                        }
+                      - tokenSecretRef = {
+                          - key  = "token"
+                          - name = "vault-token"
+                        }
+                    }
+                  - caBundle  = null
+                  - namespace = null
+                  - path      = "pki/sign/example-dot-com"
+                  - server    = "http://vault.vault.svc:8200"
+                }
+              - venafi     = {
+                  - cloud = {
+                      - apiTokenSecretRef = {
+                          - key  = null
+                          - name = null
+                        }
+                      - url               = null
+                    }
+                  - tpp   = {
+                      - caBundle       = null
+                      - credentialsRef = {
+                          - name = null
+                        }
+                      - url            = null
+                    }
+                  - zone  = null
+                }
+            }
+        } -> null
+    }
+
+  # kubernetes_secret_v1.vault-token will be destroyed
+  - resource "kubernetes_secret_v1" "vault-token" {
+      - data      = (sensitive value)
+      - id        = "cert-manager/vault-token" -> null
+      - immutable = false -> null
+      - type      = "opaque" -> null
+
+      - metadata {
+          - annotations      = {} -> null
+          - generation       = 0 -> null
+          - labels           = {} -> null
+          - name             = "vault-token" -> null
+          - namespace        = "cert-manager" -> null
+          - resource_version = "19389988" -> null
+          - uid              = "a31d5992-e048-41ef-bff5-f97d237f2042" -> null
+        }
+    }
+
+Plan: 0 to add, 0 to change, 2 to destroy.
+kubernetes_manifest.vault-issuer: Destroying...
+kubernetes_manifest.vault-issuer: Destruction complete after 0s
+kubernetes_secret_v1.vault-token: Destroying... [id=cert-manager/vault-token]
+kubernetes_secret_v1.vault-token: Destruction complete after 0s
+
+Destroy complete! Resources: 2 destroyed.
+vault_mount.pki: Refreshing state... [id=pki]
+vault_pki_secret_backend_role.role: Refreshing state... [id=pki/roles/cert-manager-io]
+vault_pki_secret_backend_root_cert.ca: Refreshing state... [id=pki/root/generate/internal]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  - destroy
+
+Terraform will perform the following actions:
+
+  # vault_mount.pki will be destroyed
+  - resource "vault_mount" "pki" {
+      - accessor                     = "pki_1d0a0ccc" -> null
+      - audit_non_hmac_request_keys  = [] -> null
+      - audit_non_hmac_response_keys = [] -> null
+      - default_lease_ttl_seconds    = 0 -> null
+      - external_entropy_access      = false -> null
+      - id                           = "pki" -> null
+      - local                        = false -> null
+      - max_lease_ttl_seconds        = 31536000 -> null
+      - options                      = {} -> null
+      - path                         = "pki" -> null
+      - seal_wrap                    = false -> null
+      - type                         = "pki" -> null
+    }
+
+  # vault_pki_secret_backend_role.role will be destroyed
+  - resource "vault_pki_secret_backend_role" "role" {
+      - allow_any_name                     = false -> null
+      - allow_bare_domains                 = false -> null
+      - allow_glob_domains                 = false -> null
+      - allow_ip_sans                      = true -> null
+      - allow_localhost                    = true -> null
+      - allow_subdomains                   = true -> null
+      - allowed_domains                    = [
+          - "cert-manager.io",
+        ] -> null
+      - allowed_domains_template           = false -> null
+      - allowed_other_sans                 = [] -> null
+      - allowed_uri_sans                   = [] -> null
+      - backend                            = "pki" -> null
+      - basic_constraints_valid_for_non_ca = false -> null
+      - client_flag                        = true -> null
+      - code_signing_flag                  = false -> null
+      - country                            = [] -> null
+      - email_protection_flag              = false -> null
+      - enforce_hostnames                  = true -> null
+      - ext_key_usage                      = [] -> null
+      - generate_lease                     = false -> null
+      - id                                 = "pki/roles/cert-manager-io" -> null
+      - key_bits                           = 2048 -> null
+      - key_type                           = "rsa" -> null
+      - key_usage                          = [
+          - "DigitalSignature",
+          - "KeyAgreement",
+          - "KeyEncipherment",
+        ] -> null
+      - locality                           = [] -> null
+      - max_ttl                            = "0" -> null
+      - name                               = "cert-manager-io" -> null
+      - no_store                           = false -> null
+      - not_before_duration                = "0s" -> null
+      - organization                       = [] -> null
+      - ou                                 = [] -> null
+      - policy_identifiers                 = [] -> null
+      - postal_code                        = [] -> null
+      - province                           = [] -> null
+      - require_cn                         = true -> null
+      - server_flag                        = true -> null
+      - street_address                     = [] -> null
+      - ttl                                = "31536000" -> null
+      - use_csr_common_name                = true -> null
+      - use_csr_sans                       = true -> null
+    }
+
+  # vault_pki_secret_backend_root_cert.ca will be destroyed
+  - resource "vault_pki_secret_backend_root_cert" "ca" {
+      - backend              = "pki" -> null
+      - certificate          = <<-EOT
+            -----BEGIN CERTIFICATE-----
+            MIIDJTCCAg2gAwIBAgIUL+01OPKRBKkNOTJQLPojW0FOnxwwDQYJKoZIhvcNAQEL
+            BQAwGjEYMBYGA1UEAxMPY2VydC1tYW5hZ2VyLmlvMB4XDTIyMDUwMzA5MTgxNloX
+            DTIzMDUwMzA5MTg0NlowGjEYMBYGA1UEAxMPY2VydC1tYW5hZ2VyLmlvMIIBIjAN
+            BgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArDH8XsvDzMI6uO2WzeLHZ013gOQH
+            XcmQIVxUG/nTCWjGMwniC143ZA6DpmTR/1VPT0Yd+ZVuT/dOdDg6naBsomilXIPG
+            0n2FyY/lbPPK6h/ZztZqOEz98X3CMrxga5mGZfXbZQYyn/KFBjtsdLv8UcotAZdH
+            Bl2CMmbDu5/BG73AbI+PMbA5L+Gzlnl+cZsG2Ql4a35zzHSU791bMpNzn2YtwN+Q
+            hDSjAmYRqk4J5/wGqkjabsFSGYnYLRWY/VENkTs6EKOUOYpP9UKaqjAk64WIHYAG
+            7qMZ6/D4F+Q71shjiZaimKjv1nzsSHy/EtJ3B3jpWoPCkkhBw1zNSnVCpQIDAQAB
+            o2MwYTAOBgNVHQ8BAf8EBAMCAQYwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQU
+            kHa7hd7qLMzAtwJBY0wBW0tPG44wHwYDVR0jBBgwFoAUkHa7hd7qLMzAtwJBY0wB
+            W0tPG44wDQYJKoZIhvcNAQELBQADggEBAJgCQRMmFUoZVOVT87EIgIoSkyvMxPbR
+            MLEdUu3J1SLVwNbNZMTYxGV7fAtB3AqsagQJfvD1RaKJBuKkxABUR18smjm7p5NG
+            0dnmEVVgMYc08094zEtbdp6HNGkpMMIrSyHb8wbc34XNvEnjnehzeg7OFFlrqY5O
+            33P7vwsvHIHQynPtUjVdL071UARA0L0MnedHIBGJz5KaHGMwiMW3wllKg6/Fqulq
+            AkwqSQNmjJtdN50siRCf/GhnWwSKY8YgOyFUDyOjXKcJvMG0okidj+kxQ7x/6ToI
+            sqB/CMmMaa821I8kQ3YVxQ7lPn3z9dbJFO0jekkCgNASxPCXklCv4Nk=
+            -----END CERTIFICATE-----
+        EOT -> null
+      - common_name          = "cert-manager.io" -> null
+      - exclude_cn_from_sans = true -> null
+      - format               = "pem" -> null
+      - id                   = "pki/root/generate/internal" -> null
+      - issuing_ca           = <<-EOT
+            -----BEGIN CERTIFICATE-----
+            MIIDJTCCAg2gAwIBAgIUL+01OPKRBKkNOTJQLPojW0FOnxwwDQYJKoZIhvcNAQEL
+            BQAwGjEYMBYGA1UEAxMPY2VydC1tYW5hZ2VyLmlvMB4XDTIyMDUwMzA5MTgxNloX
+            DTIzMDUwMzA5MTg0NlowGjEYMBYGA1UEAxMPY2VydC1tYW5hZ2VyLmlvMIIBIjAN
+            BgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArDH8XsvDzMI6uO2WzeLHZ013gOQH
+            XcmQIVxUG/nTCWjGMwniC143ZA6DpmTR/1VPT0Yd+ZVuT/dOdDg6naBsomilXIPG
+            0n2FyY/lbPPK6h/ZztZqOEz98X3CMrxga5mGZfXbZQYyn/KFBjtsdLv8UcotAZdH
+            Bl2CMmbDu5/BG73AbI+PMbA5L+Gzlnl+cZsG2Ql4a35zzHSU791bMpNzn2YtwN+Q
+            hDSjAmYRqk4J5/wGqkjabsFSGYnYLRWY/VENkTs6EKOUOYpP9UKaqjAk64WIHYAG
+            7qMZ6/D4F+Q71shjiZaimKjv1nzsSHy/EtJ3B3jpWoPCkkhBw1zNSnVCpQIDAQAB
+            o2MwYTAOBgNVHQ8BAf8EBAMCAQYwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQU
+            kHa7hd7qLMzAtwJBY0wBW0tPG44wHwYDVR0jBBgwFoAUkHa7hd7qLMzAtwJBY0wB
+            W0tPG44wDQYJKoZIhvcNAQELBQADggEBAJgCQRMmFUoZVOVT87EIgIoSkyvMxPbR
+            MLEdUu3J1SLVwNbNZMTYxGV7fAtB3AqsagQJfvD1RaKJBuKkxABUR18smjm7p5NG
+            0dnmEVVgMYc08094zEtbdp6HNGkpMMIrSyHb8wbc34XNvEnjnehzeg7OFFlrqY5O
+            33P7vwsvHIHQynPtUjVdL071UARA0L0MnedHIBGJz5KaHGMwiMW3wllKg6/Fqulq
+            AkwqSQNmjJtdN50siRCf/GhnWwSKY8YgOyFUDyOjXKcJvMG0okidj+kxQ7x/6ToI
+            sqB/CMmMaa821I8kQ3YVxQ7lPn3z9dbJFO0jekkCgNASxPCXklCv4Nk=
+            -----END CERTIFICATE-----
+        EOT -> null
+      - key_bits             = 2048 -> null
+      - key_type             = "rsa" -> null
+      - max_path_length      = -1 -> null
+      - private_key_format   = "der" -> null
+      - serial               = "2f:ed:35:38:f2:91:04:a9:0d:39:32:50:2c:fa:23:5b:41:4e:9f:1c" -> null
+      - ttl                  = "31536000" -> null
+      - type                 = "internal" -> null
+    }
+
+Plan: 0 to add, 0 to change, 3 to destroy.
+vault_pki_secret_backend_role.role: Destroying... [id=pki/roles/cert-manager-io]
+vault_pki_secret_backend_root_cert.ca: Destroying... [id=pki/root/generate/internal]
+vault_pki_secret_backend_root_cert.ca: Destruction complete after 0s
+vault_pki_secret_backend_role.role: Destruction complete after 0s
+vault_mount.pki: Destroying... [id=pki]
+vault_mount.pki: Destruction complete after 0s
+
+Destroy complete! Resources: 3 destroyed.
+helm_release.vault: Refreshing state... [id=vault]
+helm_release.cert-manager: Refreshing state... [id=cert-manager]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  - destroy
+
+Terraform will perform the following actions:
+
+  # helm_release.cert-manager will be destroyed
+  - resource "helm_release" "cert-manager" {
+      - atomic                     = false -> null
+      - chart                      = "cert-manager" -> null
+      - cleanup_on_fail            = false -> null
+      - create_namespace           = true -> null
+      - dependency_update          = false -> null
+      - disable_crd_hooks          = false -> null
+      - disable_openapi_validation = false -> null
+      - disable_webhooks           = false -> null
+      - force_update               = false -> null
+      - id                         = "cert-manager" -> null
+      - lint                       = false -> null
+      - max_history                = 0 -> null
+      - metadata                   = [
+          - {
+              - app_version = "v1.8.0"
+              - chart       = "cert-manager"
+              - name        = "cert-manager"
+              - namespace   = "cert-manager"
+              - revision    = 1
+              - values      = jsonencode(
+                    {
+                      - installCRDs = true
+                    }
+                )
+              - version     = "v1.8.0"
+            },
+        ] -> null
+      - name                       = "cert-manager" -> null
+      - namespace                  = "cert-manager" -> null
+      - recreate_pods              = false -> null
+      - render_subchart_notes      = true -> null
+      - replace                    = false -> null
+      - repository                 = "https://charts.jetstack.io" -> null
+      - reset_values               = false -> null
+      - reuse_values               = false -> null
+      - skip_crds                  = false -> null
+      - status                     = "deployed" -> null
+      - timeout                    = 300 -> null
+      - verify                     = false -> null
+      - version                    = "v1.8.0" -> null
+      - wait                       = true -> null
+      - wait_for_jobs              = false -> null
+
+      - set {
+          - name  = "installCRDs" -> null
+          - value = "true" -> null
+        }
+    }
+
+  # helm_release.vault will be destroyed
+  - resource "helm_release" "vault" {
+      - atomic                     = false -> null
+      - chart                      = "vault" -> null
+      - cleanup_on_fail            = false -> null
+      - create_namespace           = true -> null
+      - dependency_update          = false -> null
+      - disable_crd_hooks          = false -> null
+      - disable_openapi_validation = false -> null
+      - disable_webhooks           = false -> null
+      - force_update               = false -> null
+      - id                         = "vault" -> null
+      - lint                       = false -> null
+      - max_history                = 0 -> null
+      - metadata                   = [
+          - {
+              - app_version = "1.9.2"
+              - chart       = "vault"
+              - name        = "vault"
+              - namespace   = "vault"
+              - revision    = 1
+              - values      = jsonencode(
+                    {
+                      - server = {
+                          - dev     = {
+                              - enabled = true
+                            }
+                          - service = {
+                              - nodePort = 30200
+                              - type     = "NodePort"
+                            }
+                        }
+                    }
+                )
+              - version     = "0.19.0"
+            },
+        ] -> null
+      - name                       = "vault" -> null
+      - namespace                  = "vault" -> null
+      - recreate_pods              = false -> null
+      - render_subchart_notes      = true -> null
+      - replace                    = false -> null
+      - repository                 = "https://helm.releases.hashicorp.com" -> null
+      - reset_values               = false -> null
+      - reuse_values               = false -> null
+      - skip_crds                  = false -> null
+      - status                     = "deployed" -> null
+      - timeout                    = 300 -> null
+      - verify                     = false -> null
+      - version                    = "0.19.0" -> null
+      - wait                       = true -> null
+      - wait_for_jobs              = false -> null
+
+      - set {
+          - name  = "server.dev.enabled" -> null
+          - value = "true" -> null
+        }
+      - set {
+          - name  = "server.service.nodePort" -> null
+          - value = "30200" -> null
+        }
+      - set {
+          - name  = "server.service.type" -> null
+          - value = "NodePort" -> null
+        }
+    }
+
+Plan: 0 to add, 0 to change, 2 to destroy.
+helm_release.vault: Destroying... [id=vault]
+helm_release.cert-manager: Destroying... [id=cert-manager]
+helm_release.vault: Destruction complete after 1s
+helm_release.cert-manager: Destruction complete after 4s
+
+Destroy complete! Resources: 2 destroyed.
+```
+</details>

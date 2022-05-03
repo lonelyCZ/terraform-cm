@@ -551,6 +551,7 @@ WARNING: Are you sure you want to run `terragrunt destroy` in each folder of the
 <details>
 
 <summary>Click for more output details</summary>
+
 ```
 kubernetes_secret_v1.vault-token: Refreshing state... [id=cert-manager/vault-token]
 kubernetes_manifest.vault-issuer: Refreshing state...

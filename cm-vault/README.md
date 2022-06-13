@@ -1,18 +1,5 @@
 # Deploy and Setup Cert-manager and Vault with the Terraform
 
-  - [Goals](#goals)
-  - [Install `Helm`, `Terraform` and `Terragrunt`](#install-helm-terraform-and-terragrunt)
-    - [Helm](#helm)
-    - [Terraform](#terraform)
-    - [Terragrunt](#terragrunt)
-  - [Usage Steps](#usage-steps)
-    - [1. Configure Terraform Plugin Cache.](#1-configure-terraform-plugin-cache)
-    - [2. Execute `terragrunt run-all init`](#2-execute-terragrunt-run-all-init)
-    - [3. Execute `terragrunt run-all apply`](#3-execute-terragrunt-run-all-apply)
-    - [4. View Deployment Results](#4-view-deployment-results)
-    - [5. Check Status of `ClusterIssuer`](#5-check-status-of-clusterissuer)
-    - [6. Destroy Test Environment.](#6-destroy-test-environment)
-
 ## Goals
 
 1. Deploy and setup Cert-manager and Vault in test environment with Terraform.
@@ -21,50 +8,25 @@
 
 3. Automate to create a ClusterIssuer that represents the certificate authority Vault.
 
+## Dependencies Graph
 
-## Install `Helm`, `Terraform` and `Terragrunt`
-
-These all are open source softwares, you can directly install them by official documentation.
-
-### Helm
-
-Helm is the best way to find, share, and use software built for Kubernetes.
-
-[Installing Helm](https://helm.sh/docs/intro/install/)
-
-### Terraform
-
-Terraform is an IT infrastructure automation orchestration tool.
-
-[Install Terraform](https://www.terraform.io/downloads)
-
-### Terragrunt
-
-Terragrunt is a thin wrapper that provides extra tools for keeping your configurations DRY, working with multiple Terraform modules, and managing remote state.
-
-[Install Terragrunt](https://terragrunt.gruntwork.io/docs/getting-started/install/)
-
+![image](graph.svg)
 ## Usage Steps
 
-### 1. Configure Terraform Plugin Cache.
-
+### 1. Execute `terragrunt run-all init`
 ```
-export TF_PLUGIN_CACHE_DIR="$HOME/.terraform.d/plugin-cache" 
-```
-
-### 2. Execute `terragrunt run-all init`
-```
-[root@master68 terraform-cm]# terragrunt run-all init
-INFO[0000] The stack at /root/lonelyCZ/terraform-cm will be processed in the following order for command init:
+[root@master68 cm-vault]# terragrunt run-all init
+INFO[0000] The stack at /root/lonelyCZ/terraform-cm/cm-vault will be processed in the following order for command init:
 Group 1
-- Module /root/lonelyCZ/terraform-cm/helm-release
+- Module /root/lonelyCZ/terraform-cm/cm-vault/cm-install
+- Module /root/lonelyCZ/terraform-cm/cm-vault/vault-install
 
 Group 2
-- Module /root/lonelyCZ/terraform-cm/vault-config
+- Module /root/lonelyCZ/terraform-cm/cm-vault/vault-config
 
 Group 3
-- Module /root/lonelyCZ/terraform-cm/cert-manager-config
- 
+- Module /root/lonelyCZ/terraform-cm/cm-vault/cm-config
+
 
 Initializing the backend...
 ```
@@ -74,13 +36,11 @@ Initializing the backend...
 
 ```
 Initializing provider plugins...
-- Finding hashicorp/helm versions matching "~> 2.5.1"...
-- Using hashicorp/helm v2.5.1 from the shared cache directory
+- Reusing previous version of hashicorp/helm from the dependency lock file
 
-Terraform has created a lock file .terraform.lock.hcl to record the provider
-selections it made above. Include this file in your version control repository
-so that Terraform can guarantee to make the same selections by default when
-you run "terraform init" in the future.
+Initializing provider plugins...
+- Reusing previous version of hashicorp/helm from the dependency lock file
+- Using previously-installed hashicorp/helm v2.5.1
 
 Terraform has been successfully initialized!
 
@@ -95,13 +55,19 @@ commands will detect it and remind you to do so if necessary.
 Initializing the backend...
 
 Initializing provider plugins...
-- Finding hashicorp/vault versions matching "~> 3.5.0"...
-- Using hashicorp/vault v3.5.0 from the shared cache directory
+- Reusing previous version of hashicorp/vault from the dependency lock file
+- Using previously-installed hashicorp/helm v2.5.1
 
-Terraform has created a lock file .terraform.lock.hcl to record the provider
-selections it made above. Include this file in your version control repository
-so that Terraform can guarantee to make the same selections by default when
-you run "terraform init" in the future.
+Terraform has been successfully initialized!
+
+You may now begin working with Terraform. Try running "terraform plan" to see
+any changes that are required for your infrastructure. All Terraform commands
+should now work.
+
+If you ever set or change modules or backend configuration for Terraform,
+rerun this command to reinitialize your working directory. If you forget, other
+commands will detect it and remind you to do so if necessary.
+- Using previously-installed hashicorp/vault v3.5.0
 
 Terraform has been successfully initialized!
 
@@ -116,13 +82,8 @@ commands will detect it and remind you to do so if necessary.
 Initializing the backend...
 
 Initializing provider plugins...
-- Finding hashicorp/kubernetes versions matching "~> 2.11.0"...
-- Using hashicorp/kubernetes v2.11.0 from the shared cache directory
-
-Terraform has created a lock file .terraform.lock.hcl to record the provider
-selections it made above. Include this file in your version control repository
-so that Terraform can guarantee to make the same selections by default when
-you run "terraform init" in the future.
+- Reusing previous version of hashicorp/kubernetes from the dependency lock file
+- Using previously-installed hashicorp/kubernetes v2.11.0
 
 Terraform has been successfully initialized!
 
@@ -137,20 +98,21 @@ commands will detect it and remind you to do so if necessary.
 </details>  
 
 
-### 3. Execute `terragrunt run-all apply`
+### 2. Execute `terragrunt run-all apply`
 
 ```
-[root@master68 terraform-cm]# terragrunt run-all apply
-INFO[0000] The stack at /root/lonelyCZ/terraform-cm will be processed in the following order for command apply:
+[root@master68 cm-vault]# terragrunt run-all apply
+INFO[0000] The stack at /root/lonelyCZ/terraform-cm/cm-vault will be processed in the following order for command apply:
 Group 1
-- Module /root/lonelyCZ/terraform-cm/helm-release
+- Module /root/lonelyCZ/terraform-cm/cm-vault/cm-install
+- Module /root/lonelyCZ/terraform-cm/cm-vault/vault-install
 
 Group 2
-- Module /root/lonelyCZ/terraform-cm/vault-config
+- Module /root/lonelyCZ/terraform-cm/cm-vault/vault-config
 
 Group 3
-- Module /root/lonelyCZ/terraform-cm/cert-manager-config
- 
+- Module /root/lonelyCZ/terraform-cm/cm-vault/cm-config
+
 Are you sure you want to run 'terragrunt apply' in each folder of the stack described above? (y/n) y
 ```
 
@@ -159,6 +121,60 @@ Are you sure you want to run 'terragrunt apply' in each folder of the stack desc
 <summary>Click for more output details</summary>
 
 ```
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # helm_release.vault will be created
+  + resource "helm_release" "vault" {
+      + atomic                     = false
+      + chart                      = "vault"
+      + cleanup_on_fail            = false
+      + create_namespace           = true
+      + dependency_update          = false
+      + disable_crd_hooks          = false
+      + disable_openapi_validation = false
+      + disable_webhooks           = false
+      + force_update               = false
+      + id                         = (known after apply)
+      + lint                       = false
+      + manifest                   = (known after apply)
+      + max_history                = 0
+      + metadata                   = (known after apply)
+      + name                       = "vault"
+      + namespace                  = "vault"
+      + recreate_pods              = false
+      + render_subchart_notes      = true
+      + replace                    = false
+      + repository                 = "https://helm.releases.hashicorp.com"
+      + reset_values               = false
+      + reuse_values               = false
+      + skip_crds                  = false
+      + status                     = "deployed"
+      + timeout                    = 300
+      + verify                     = false
+      + version                    = "0.20.1"
+      + wait                       = true
+      + wait_for_jobs              = false
+
+      + set {
+          + name  = "server.dev.enabled"
+          + value = "true"
+        }
+      + set {
+          + name  = "server.service.nodePort"
+          + value = "30200"
+        }
+      + set {
+          + name  = "server.service.type"
+          + value = "NodePort"
+        }
+    }
+
+Plan: 1 to add, 0 to change, 0 to destroy.
+
 Terraform used the selected providers to generate the following execution
 plan. Resource actions are indicated with the following symbols:
   + create
@@ -203,69 +219,14 @@ Terraform will perform the following actions:
         }
     }
 
-  # helm_release.vault will be created
-  + resource "helm_release" "vault" {
-      + atomic                     = false
-      + chart                      = "vault"
-      + cleanup_on_fail            = false
-      + create_namespace           = true
-      + dependency_update          = false
-      + disable_crd_hooks          = false
-      + disable_openapi_validation = false
-      + disable_webhooks           = false
-      + force_update               = false
-      + id                         = (known after apply)
-      + lint                       = false
-      + manifest                   = (known after apply)
-      + max_history                = 0
-      + metadata                   = (known after apply)
-      + name                       = "vault"
-      + namespace                  = "vault"
-      + recreate_pods              = false
-      + render_subchart_notes      = true
-      + replace                    = false
-      + repository                 = "https://helm.releases.hashicorp.com"
-      + reset_values               = false
-      + reuse_values               = false
-      + skip_crds                  = false
-      + status                     = "deployed"
-      + timeout                    = 300
-      + verify                     = false
-      + version                    = "0.19.0"
-      + wait                       = true
-      + wait_for_jobs              = false
-
-      + set {
-          + name  = "server.dev.enabled"
-          + value = "true"
-        }
-      + set {
-          + name  = "server.service.nodePort"
-          + value = "30200"
-        }
-      + set {
-          + name  = "server.service.type"
-          + value = "NodePort"
-        }
-    }
-
-Plan: 2 to add, 0 to change, 0 to destroy.
+Plan: 1 to add, 0 to change, 0 to destroy.
 helm_release.vault: Creating...
 helm_release.cert-manager: Creating...
 helm_release.vault: Still creating... [10s elapsed]
 helm_release.cert-manager: Still creating... [10s elapsed]
-helm_release.vault: Creation complete after 15s [id=vault]
-helm_release.cert-manager: Still creating... [20s elapsed]
-helm_release.cert-manager: Still creating... [30s elapsed]
-helm_release.cert-manager: Still creating... [40s elapsed]
-helm_release.cert-manager: Still creating... [50s elapsed]
-helm_release.cert-manager: Still creating... [1m0s elapsed]
-helm_release.cert-manager: Still creating... [1m10s elapsed]
-helm_release.cert-manager: Still creating... [1m20s elapsed]
-helm_release.cert-manager: Still creating... [1m30s elapsed]
-helm_release.cert-manager: Creation complete after 1m38s [id=cert-manager]
+helm_release.vault: Creation complete after 12s [id=vault]
 
-Apply complete! Resources: 2 added, 0 changed, 0 destroyed.
+Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 
 Terraform used the selected providers to generate the following execution
 plan. Resource actions are indicated with the following symbols:
@@ -339,13 +300,23 @@ Terraform will perform the following actions:
 
 Plan: 3 to add, 0 to change, 0 to destroy.
 vault_mount.pki: Creating...
-vault_mount.pki: Creation complete after 0s [id=pki]
+vault_mount.pki: Creation complete after 1s [id=pki]
 vault_pki_secret_backend_root_cert.ca: Creating...
 vault_pki_secret_backend_role.role: Creating...
 vault_pki_secret_backend_role.role: Creation complete after 0s [id=pki/roles/cert-manager-io]
-vault_pki_secret_backend_root_cert.ca: Creation complete after 1s [id=pki/root/generate/internal]
+vault_pki_secret_backend_root_cert.ca: Creation complete after 0s [id=pki/root/generate/internal]
 
 Apply complete! Resources: 3 added, 0 changed, 0 destroyed.
+helm_release.cert-manager: Still creating... [20s elapsed]
+helm_release.cert-manager: Still creating... [30s elapsed]
+helm_release.cert-manager: Still creating... [40s elapsed]
+helm_release.cert-manager: Still creating... [50s elapsed]
+helm_release.cert-manager: Still creating... [1m0s elapsed]
+helm_release.cert-manager: Still creating... [1m10s elapsed]
+helm_release.cert-manager: Still creating... [1m20s elapsed]
+helm_release.cert-manager: Creation complete after 1m23s [id=cert-manager]
+
+Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 
 Terraform used the selected providers to generate the following execution
 plan. Resource actions are indicated with the following symbols:
@@ -499,53 +470,52 @@ Apply complete! Resources: 2 added, 0 changed, 0 destroyed.
 ```
 </details>
 
-### 4. View Deployment Results
+### 3. View Deployment Results
 
 ```
-[root@master68 terraform-cm]# kubectl get pod -A
-NAMESPACE        NAME                                      READY   STATUS    RESTARTS        AGE
-cert-manager     cert-manager-6bbf595697-6dvpz             1/1     Running   0               3m41s
-cert-manager     cert-manager-cainjector-6bc9d758b-6qq7b   1/1     Running   0               3m41s
-cert-manager     cert-manager-webhook-586d45d5ff-s8ql9     1/1     Running   0               3m41s
-default          nginx-6799fc88d8-tn5wx                    2/2     Running   0               9d
-karmada-system   karmada-agent-57994899b-4xg77             1/1     Running   30 (6d6h ago)   10d
-karmada-system   karmada-agent-57994899b-c77sm             1/1     Running   4 (6d6h ago)    10d
-kube-system      coredns-7f6cbbb7b8-77wjk                  1/1     Running   9 (10d ago)     155d
-kube-system      coredns-7f6cbbb7b8-hhp8x                  1/1     Running   9 (10d ago)     155d
-kube-system      etcd-master68                             1/1     Running   4 (10d ago)     44d
-kube-system      kube-apiserver-master68                   1/1     Running   5 (10d ago)     44d
-kube-system      kube-controller-manager-master68          1/1     Running   55 (10d ago)    44d
-kube-system      kube-flannel-ds-4zh8n                     1/1     Running   6 (26d ago)     61d
-kube-system      kube-flannel-ds-9w82j                     1/1     Running   13 (10d ago)    155d
-kube-system      kube-proxy-hc8mk                          1/1     Running   4 (26d ago)     61d
-kube-system      kube-proxy-hp966                          1/1     Running   10 (10d ago)    166d
-kube-system      kube-scheduler-master68                   1/1     Running   52 (10d ago)    44d
-vault            vault-0                                   1/1     Running   0               3m53s
-vault            vault-agent-injector-6cd49f8bbd-vq74f     1/1     Running   0               3m53s
+[root@master68 cm-vault]# kubectl get pod -A
+NAMESPACE      NAME                                      READY   STATUS    RESTARTS        AGE
+cert-manager   cert-manager-6bbf595697-sdzvd             1/1     Running   0               3m29s
+cert-manager   cert-manager-cainjector-6bc9d758b-g225g   1/1     Running   0               3m29s
+cert-manager   cert-manager-webhook-586d45d5ff-wgfx2     1/1     Running   0               3m29s
+default        nginx-6799fc88d8-f6m92                    1/1     Running   3 (17h ago)     29d
+kube-system    coredns-7f6cbbb7b8-77wjk                  1/1     Running   14 (17h ago)    196d
+kube-system    coredns-7f6cbbb7b8-hhp8x                  1/1     Running   14 (17h ago)    196d
+kube-system    etcd-master68                             1/1     Running   9 (17h ago)     85d
+kube-system    kube-apiserver-master68                   1/1     Running   211 (17h ago)   85d
+kube-system    kube-controller-manager-master68          1/1     Running   61 (17h ago)    85d
+kube-system    kube-flannel-ds-4zh8n                     1/1     Running   8 (3d20h ago)   102d
+kube-system    kube-flannel-ds-9w82j                     1/1     Running   17 (17h ago)    196d
+kube-system    kube-proxy-hc8mk                          1/1     Running   6 (3d20h ago)   102d
+kube-system    kube-proxy-v855g                          1/1     Running   5 (17h ago)     36d
+kube-system    kube-scheduler-master68                   1/1     Running   58 (17h ago)    85d
+vault          vault-0                                   1/1     Running   0               3m32s
+vault          vault-agent-injector-5b5889ffb4-fdfhq     1/1     Running   0               3m32s
 ```
 
-### 5. Check Status of `ClusterIssuer`
+### 4. Check Status of `ClusterIssuer`
 
 ```
-[root@master68 terraform-cm]# kubectl get clusterissuers -o wide
+[root@master68 cm-vault]# kubectl get clusterissuers -o wide
 NAME           READY   STATUS           AGE
-vault-issuer   True    Vault verified   3m24s
+vault-issuer   True    Vault verified   2m57s
 ```
 
-### 6. Destroy Test Environment.
+### 5. Destroy Test Environment.
 
 ```
-[root@master68 terraform-cm]# terragrunt run-all destroy
-INFO[0000] The stack at /root/lonelyCZ/terraform-cm will be processed in the following order for command destroy:
+[root@master68 cm-vault]# terragrunt run-all destroy
+INFO[0000] The stack at /root/lonelyCZ/terraform-cm/cm-vault will be processed in the following order for command destroy:
 Group 1
-- Module /root/lonelyCZ/terraform-cm/cert-manager-config
+- Module /root/lonelyCZ/terraform-cm/cm-vault/cm-config
 
 Group 2
-- Module /root/lonelyCZ/terraform-cm/vault-config
+- Module /root/lonelyCZ/terraform-cm/cm-vault/cm-install
+- Module /root/lonelyCZ/terraform-cm/cm-vault/vault-config
 
 Group 3
-- Module /root/lonelyCZ/terraform-cm/helm-release
- 
+- Module /root/lonelyCZ/terraform-cm/cm-vault/vault-install
+
 WARNING: Are you sure you want to run `terragrunt destroy` in each folder of the stack described above? There is no undo! (y/n) y
 ```
 <details>
@@ -696,8 +666,8 @@ Terraform will perform the following actions:
           - labels           = {} -> null
           - name             = "vault-token" -> null
           - namespace        = "cert-manager" -> null
-          - resource_version = "19389988" -> null
-          - uid              = "a31d5992-e048-41ef-bff5-f97d237f2042" -> null
+          - resource_version = "23882412" -> null
+          - uid              = "d453578d-01a3-407f-9b97-8a4033adc98d" -> null
         }
     }
 
@@ -709,8 +679,9 @@ kubernetes_secret_v1.vault-token: Destruction complete after 0s
 
 Destroy complete! Resources: 2 destroyed.
 vault_mount.pki: Refreshing state... [id=pki]
-vault_pki_secret_backend_role.role: Refreshing state... [id=pki/roles/cert-manager-io]
 vault_pki_secret_backend_root_cert.ca: Refreshing state... [id=pki/root/generate/internal]
+vault_pki_secret_backend_role.role: Refreshing state... [id=pki/roles/cert-manager-io]
+helm_release.cert-manager: Refreshing state... [id=cert-manager]
 
 Terraform used the selected providers to generate the following execution
 plan. Resource actions are indicated with the following symbols:
@@ -720,7 +691,7 @@ Terraform will perform the following actions:
 
   # vault_mount.pki will be destroyed
   - resource "vault_mount" "pki" {
-      - accessor                     = "pki_1d0a0ccc" -> null
+      - accessor                     = "pki_0c849bef" -> null
       - audit_non_hmac_request_keys  = [] -> null
       - audit_non_hmac_response_keys = [] -> null
       - default_lease_ttl_seconds    = 0 -> null
@@ -788,23 +759,23 @@ Terraform will perform the following actions:
       - backend              = "pki" -> null
       - certificate          = <<-EOT
             -----BEGIN CERTIFICATE-----
-            MIIDJTCCAg2gAwIBAgIUL+01OPKRBKkNOTJQLPojW0FOnxwwDQYJKoZIhvcNAQEL
-            BQAwGjEYMBYGA1UEAxMPY2VydC1tYW5hZ2VyLmlvMB4XDTIyMDUwMzA5MTgxNloX
-            DTIzMDUwMzA5MTg0NlowGjEYMBYGA1UEAxMPY2VydC1tYW5hZ2VyLmlvMIIBIjAN
-            BgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArDH8XsvDzMI6uO2WzeLHZ013gOQH
-            XcmQIVxUG/nTCWjGMwniC143ZA6DpmTR/1VPT0Yd+ZVuT/dOdDg6naBsomilXIPG
-            0n2FyY/lbPPK6h/ZztZqOEz98X3CMrxga5mGZfXbZQYyn/KFBjtsdLv8UcotAZdH
-            Bl2CMmbDu5/BG73AbI+PMbA5L+Gzlnl+cZsG2Ql4a35zzHSU791bMpNzn2YtwN+Q
-            hDSjAmYRqk4J5/wGqkjabsFSGYnYLRWY/VENkTs6EKOUOYpP9UKaqjAk64WIHYAG
-            7qMZ6/D4F+Q71shjiZaimKjv1nzsSHy/EtJ3B3jpWoPCkkhBw1zNSnVCpQIDAQAB
+            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
-            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
+            /ZC7AP05iys65oeyeO4fhWAPudkwHwYDVR0jBBgwFoAU/ZC7AP05iys65oeyeO4f
+            hWAPudkwDQYJKoZIhvcNAQELBQADggEBAMXt+Lm/LYsMY/AH5k40xWIXNUZrX6NT
+            0s9+pw5x7iFLVvXBTb4MUCyrrGM6ISxWsq+qC5iV7q8jIBrg4+UKhYD6smCQTX4F
+            59gzKm+ZqaBNZNT8jgm13MUUx9a+jGeSrArhcvf9ywkTtTvuyFiv/E82a9K/yACv
+            phAtvhwJWE1YhQb77g/TQy9puZXV0vemFBAboKu4Rd9bt6HYXWts+hDTNTFqgXOx
+            4SH/W0TRt0tlkvhQFyk/+/spBAvuNiP71VR4HAn/RatL+A8kmoBmxdYSH3of3IKL
+            ZRhorRGS0r6JEGFVO5Af0ej6YHF2WKQyChtNc/qHYIlT4aagDSC2ja4=
             -----END CERTIFICATE-----
         EOT -> null
       - common_name          = "cert-manager.io" -> null
@@ -813,30 +784,30 @@ Terraform will perform the following actions:
       - id                   = "pki/root/generate/internal" -> null
       - issuing_ca           = <<-EOT
             -----BEGIN CERTIFICATE-----
-            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
+            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
-            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
+            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
             -----END CERTIFICATE-----
         EOT -> null
       - key_bits             = 2048 -> null
       - key_type             = "rsa" -> null
       - max_path_length      = -1 -> null
       - private_key_format   = "der" -> null
-      - serial               = "2f:ed:35:38:f2:91:04:a9:0d:39:32:50:2c:fa:23:5b:41:4e:9f:1c" -> null
+      - serial               = "54:31:1b:91:0f:87:27:56:82:60:03:68:27:8c:37:e8:ba:74:14:c7" -> null
       - ttl                  = "31536000" -> null
       - type                 = "internal" -> null
     }
@@ -844,14 +815,88 @@ Terraform will perform the following actions:
 Plan: 0 to add, 0 to change, 3 to destroy.
 vault_pki_secret_backend_role.role: Destroying... [id=pki/roles/cert-manager-io]
 vault_pki_secret_backend_root_cert.ca: Destroying... [id=pki/root/generate/internal]
-vault_pki_secret_backend_root_cert.ca: Destruction complete after 0s
 vault_pki_secret_backend_role.role: Destruction complete after 0s
+vault_pki_secret_backend_root_cert.ca: Destruction complete after 0s
 vault_mount.pki: Destroying... [id=pki]
 vault_mount.pki: Destruction complete after 0s
 
 Destroy complete! Resources: 3 destroyed.
 helm_release.vault: Refreshing state... [id=vault]
-helm_release.cert-manager: Refreshing state... [id=cert-manager]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  - destroy
+
+Terraform will perform the following actions:
+
+  # helm_release.vault will be destroyed
+  - resource "helm_release" "vault" {
+      - atomic                     = false -> null
+      - chart                      = "vault" -> null
+      - cleanup_on_fail            = false -> null
+      - create_namespace           = true -> null
+      - dependency_update          = false -> null
+      - disable_crd_hooks          = false -> null
+      - disable_openapi_validation = false -> null
+      - disable_webhooks           = false -> null
+      - force_update               = false -> null
+      - id                         = "vault" -> null
+      - lint                       = false -> null
+      - max_history                = 0 -> null
+      - metadata                   = [
+          - {
+              - app_version = "1.10.3"
+              - chart       = "vault"
+              - name        = "vault"
+              - namespace   = "vault"
+              - revision    = 1
+              - values      = jsonencode(
+                    {
+                      - server = {
+                          - dev     = {
+                              - enabled = true
+                            }
+                          - service = {
+                              - nodePort = 30200
+                              - type     = "NodePort"
+                            }
+                        }
+                    }
+                )
+              - version     = "0.20.1"
+            },
+        ] -> null
+      - name                       = "vault" -> null
+      - namespace                  = "vault" -> null
+      - recreate_pods              = false -> null
+      - render_subchart_notes      = true -> null
+      - replace                    = false -> null
+      - repository                 = "https://helm.releases.hashicorp.com" -> null
+      - reset_values               = false -> null
+      - reuse_values               = false -> null
+      - skip_crds                  = false -> null
+      - status                     = "deployed" -> null
+      - timeout                    = 300 -> null
+      - verify                     = false -> null
+      - version                    = "0.20.1" -> null
+      - wait                       = true -> null
+      - wait_for_jobs              = false -> null
+
+      - set {
+          - name  = "server.dev.enabled" -> null
+          - value = "true" -> null
+        }
+      - set {
+          - name  = "server.service.nodePort" -> null
+          - value = "30200" -> null
+        }
+      - set {
+          - name  = "server.service.type" -> null
+          - value = "NodePort" -> null
+        }
+    }
+
+Plan: 0 to add, 0 to change, 1 to destroy.
 
 Terraform used the selected providers to generate the following execution
 plan. Resource actions are indicated with the following symbols:
@@ -910,79 +955,14 @@ Terraform will perform the following actions:
         }
     }
 
-  # helm_release.vault will be destroyed
-  - resource "helm_release" "vault" {
-      - atomic                     = false -> null
-      - chart                      = "vault" -> null
-      - cleanup_on_fail            = false -> null
-      - create_namespace           = true -> null
-      - dependency_update          = false -> null
-      - disable_crd_hooks          = false -> null
-      - disable_openapi_validation = false -> null
-      - disable_webhooks           = false -> null
-      - force_update               = false -> null
-      - id                         = "vault" -> null
-      - lint                       = false -> null
-      - max_history                = 0 -> null
-      - metadata                   = [
-          - {
-              - app_version = "1.9.2"
-              - chart       = "vault"
-              - name        = "vault"
-              - namespace   = "vault"
-              - revision    = 1
-              - values      = jsonencode(
-                    {
-                      - server = {
-                          - dev     = {
-                              - enabled = true
-                            }
-                          - service = {
-                              - nodePort = 30200
-                              - type     = "NodePort"
-                            }
-                        }
-                    }
-                )
-              - version     = "0.19.0"
-            },
-        ] -> null
-      - name                       = "vault" -> null
-      - namespace                  = "vault" -> null
-      - recreate_pods              = false -> null
-      - render_subchart_notes      = true -> null
-      - replace                    = false -> null
-      - repository                 = "https://helm.releases.hashicorp.com" -> null
-      - reset_values               = false -> null
-      - reuse_values               = false -> null
-      - skip_crds                  = false -> null
-      - status                     = "deployed" -> null
-      - timeout                    = 300 -> null
-      - verify                     = false -> null
-      - version                    = "0.19.0" -> null
-      - wait                       = true -> null
-      - wait_for_jobs              = false -> null
-
-      - set {
-          - name  = "server.dev.enabled" -> null
-          - value = "true" -> null
-        }
-      - set {
-          - name  = "server.service.nodePort" -> null
-          - value = "30200" -> null
-        }
-      - set {
-          - name  = "server.service.type" -> null
-          - value = "NodePort" -> null
-        }
-    }
-
-Plan: 0 to add, 0 to change, 2 to destroy.
+Plan: 0 to add, 0 to change, 1 to destroy.
 helm_release.vault: Destroying... [id=vault]
 helm_release.cert-manager: Destroying... [id=cert-manager]
 helm_release.vault: Destruction complete after 1s
-helm_release.cert-manager: Destruction complete after 4s
 
-Destroy complete! Resources: 2 destroyed.
+Destroy complete! Resources: 1 destroyed.
+helm_release.cert-manager: Destruction complete after 3s
+
+Destroy complete! Resources: 1 destroyed.
 ```
 </details>

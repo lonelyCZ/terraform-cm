@@ -47,9 +47,9 @@ export TF_PLUGIN_CACHE_DIR="$HOME/.terraform.d/plugin-cache"
 
 ## Usage Steps
 
-### 1. Go to the installation directory of specific dependency.
-
 Take Vault as a example.
+
+### 1. Go to the installation directory of specific dependency.
 
 ```
 cd cm-vault
@@ -57,17 +57,18 @@ cd cm-vault
 
 ### 2. Execute `terragrunt run-all init`
 ```
-[root@master68 terraform-cm]# terragrunt run-all init
-INFO[0000] The stack at /root/lonelyCZ/terraform-cm will be processed in the following order for command init:
+[root@master68 cm-vault]# terragrunt run-all init
+INFO[0000] The stack at /root/lonelyCZ/terraform-cm/cm-vault will be processed in the following order for command init:
 Group 1
-- Module /root/lonelyCZ/terraform-cm/helm-release
+- Module /root/lonelyCZ/terraform-cm/cm-vault/cm-install
+- Module /root/lonelyCZ/terraform-cm/cm-vault/vault-install
 
 Group 2
-- Module /root/lonelyCZ/terraform-cm/vault-config
+- Module /root/lonelyCZ/terraform-cm/cm-vault/vault-config
 
 Group 3
-- Module /root/lonelyCZ/terraform-cm/cert-manager-config
- 
+- Module /root/lonelyCZ/terraform-cm/cm-vault/cm-config
+
 
 Initializing the backend...
 ```
@@ -75,33 +76,35 @@ Initializing the backend...
 ### 3. Execute `terragrunt run-all apply`
 
 ```
-[root@master68 terraform-cm]# terragrunt run-all apply
-INFO[0000] The stack at /root/lonelyCZ/terraform-cm will be processed in the following order for command apply:
+[root@master68 cm-vault]# terragrunt run-all apply
+INFO[0000] The stack at /root/lonelyCZ/terraform-cm/cm-vault will be processed in the following order for command apply:
 Group 1
-- Module /root/lonelyCZ/terraform-cm/helm-release
+- Module /root/lonelyCZ/terraform-cm/cm-vault/cm-install
+- Module /root/lonelyCZ/terraform-cm/cm-vault/vault-install
 
 Group 2
-- Module /root/lonelyCZ/terraform-cm/vault-config
+- Module /root/lonelyCZ/terraform-cm/cm-vault/vault-config
 
 Group 3
-- Module /root/lonelyCZ/terraform-cm/cert-manager-config
- 
+- Module /root/lonelyCZ/terraform-cm/cm-vault/cm-config
+
 Are you sure you want to run 'terragrunt apply' in each folder of the stack described above? (y/n) y
 ```
 
 ### 4. Destroy Test Environment.
 
 ```
-[root@master68 terraform-cm]# terragrunt run-all destroy
-INFO[0000] The stack at /root/lonelyCZ/terraform-cm will be processed in the following order for command destroy:
+[root@master68 cm-vault]# terragrunt run-all destroy
+INFO[0000] The stack at /root/lonelyCZ/terraform-cm/cm-vault will be processed in the following order for command destroy:
 Group 1
-- Module /root/lonelyCZ/terraform-cm/cert-manager-config
+- Module /root/lonelyCZ/terraform-cm/cm-vault/cm-config
 
 Group 2
-- Module /root/lonelyCZ/terraform-cm/vault-config
+- Module /root/lonelyCZ/terraform-cm/cm-vault/cm-install
+- Module /root/lonelyCZ/terraform-cm/cm-vault/vault-config
 
 Group 3
-- Module /root/lonelyCZ/terraform-cm/helm-release
- 
+- Module /root/lonelyCZ/terraform-cm/cm-vault/vault-install
+
 WARNING: Are you sure you want to run `terragrunt destroy` in each folder of the stack described above? There is no undo! (y/n) y
 ```

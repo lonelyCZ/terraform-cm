@@ -29,6 +29,6 @@ resource "helm_release" "cert-manager" {
 
   set {
     name = "extraArgs"
-    value = "extraArgs={--feature-gates=ExperimentalGatewayAPISupport=true}"
+    value = "{--feature-gates=ExperimentalGatewayAPISupport=true}"
   }
 }
